@@ -4,9 +4,9 @@ import shutil
 import datetime
 from send2trash import send2trash
 
-
 SOURCE = 'Downloads'
 METADATA = 'meta.json'
+THRESHOLD = 1   # period of inactivity after which certain filetypes will be deleted (est. in days)
 
 def read_metadata(source):
     with open(source, 'r') as f:
@@ -51,7 +51,7 @@ def shove_intensely(objects):
             elif ext in ['.jpg', '.png', '.jpeg', '.heic', '.webp', '.html', '.avif']: 
                 time_now = datetime.datetime.now()
                 last_access_time = datetime.datetime.fromtimestamp(os.path.getatime(path))
-                threshold = datetime.timedelta(days=1)
+                threshold = datetime.timedelta(days=THRESHOLD)
                 if time_now - last_access_time >= threshold:
                     send2trash(path)
                 
