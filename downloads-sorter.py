@@ -1,12 +1,16 @@
 import os
-import json
-import shutil
 import datetime
+import json
+from typing import Final
+import shutil
 from send2trash import send2trash
 
-SOURCE = 'Downloads'
-METADATA = 'meta.json'
-THRESHOLD = 1   # period of inactivity after which certain filetypes will be deleted (est. in days)
+SOURCE: Final = 'C:\\Users\\alexi\\Downloads'
+METADATA: Final = 'meta.json'
+THRESHOLD: Final = 1   # period of inactivity after which certain filetypes will be deleted (est. in days)
+TO_BE_DELETED: Final = '.jpg', '.png', '.jpeg', '.heic', '.webp', '.html', '.avif', '.mp4', '.mkv', '.avi', '.webm', '.gif', '.torrent'
+ARCHIVE_FILETYPES: Final = '.zip', '.rar', '.jar', '.7z'
+ARCHIVE_FOLDERNAME = 'archives'
 
 def read_metadata(source):
     with open(source, 'r') as f:
@@ -35,39 +39,32 @@ def create_dir(path, dname, white):
 def shove_intensely(objects):
     root = objects['root']
     whitelist = get_metadata(root)
-
     for file in objects['files']:
         name = file['name']
         ext = file['ext']
         path = file['path']
         fullname = name + ext
         if  fullname not in whitelist:
-            if ext in ['.zip', '.rar']:
-                temp = os.path.join(root, 'archives')
-                whitelist = create_dir(temp, 'archives', whitelist)
+            if ext in ARCHIVE_FILETYPES:
+                temp = os.path.join(root, ARCHIVE_FOLDERNAME)
+                whitelist = create_dir(temp, ARCHIVE_FOLDERNAME, whitelist)
                 shutil.copy(path, temp)
                 os.remove(path)
-                
-            elif ext in ['.jpg', '.png', '.jpeg', '.heic', '.webp', '.html', '.avif']: 
+            elif ext in TO_BE_DELETED: 
                 time_now = datetime.datetime.now()
                 last_access_time = datetime.datetime.fromtimestamp(os.path.getatime(path))
                 threshold = datetime.timedelta(days=THRESHOLD)
                 if time_now - last_access_time >= threshold:
                     send2trash(path)
-                
             else:
                 temp = os.path.join(root, ext)
                 whitelist = create_dir(temp, ext, whitelist)
                 shutil.copy(path, temp)
                 os.remove(path)
-            
-        
     for directory in objects['dirs']:
         if directory['name'] not in whitelist:
             send2trash(directory['path'])
-    
     update_metadata(root, whitelist)
-        
 
 def find_all_dirs_n_files_in(source):
     for root, dirs, files in os.walk(source):
@@ -80,9 +77,7 @@ def find_all_dirs_n_files_in(source):
         }
 
 def main(source=SOURCE):
-    cwd = os.getcwd()
-    source_path = os.path.join(cwd, source)
-    all_kinds = find_all_dirs_n_files_in(source_path)
+    all_kinds = find_all_dirs_n_files_in(source)
     shove_intensely(all_kinds)
     print('Sorted!')
 
