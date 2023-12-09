@@ -7,7 +7,7 @@ from send2trash import send2trash
 
 SOURCE: Final = 'C:\\Users\\alexi\\Downloads'
 METADATA: Final = 'meta.json'
-THRESHOLD: Final = 1   # period of inactivity after which certain filetypes will be deleted (est. in days)
+THRESHOLD: Final = 1   # period of inactivity after which certain filetypes will be deleted (est. in days) 
 TO_BE_DELETED: Final = '.jpg', '.png', '.jpeg', '.heic', '.webp', '.html', '.avif', '.mp4', '.mkv', '.avi', '.webm', '.gif', '.torrent'
 ARCHIVE_FILETYPES: Final = '.zip', '.rar', '.jar', '.7z'
 ARCHIVE_FOLDERNAME = 'archives'
